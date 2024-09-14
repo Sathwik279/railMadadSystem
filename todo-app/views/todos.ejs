@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="<%=csrfToken%>" />
+    <!-- <meta name="//csrf-token" content="<%=//csrfToken%>" /> -->
     <link href="./css/styles.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,15 +11,15 @@
     </style>
     <title></title>
     <script>
-      var token = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
+      // var token = document
+      //   .querySelector('meta[name="//csrf-token"]')
+      //   .getAttribute("content");
       function updateTodo(id) {
         fetch(`/todos/${id}`, {
           method: "put",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            _csrf: token,
+            // _//csrf: token,
             completed: "updateCompleted",
           }),
         })
@@ -35,7 +35,7 @@
           method: "delete",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            _csrf: token,
+            // _//csrf: token,
           }),
         })
           .then((res) => {
@@ -52,31 +52,37 @@
       <div class="col-start-3 col-span-4">
         <%- include('header.ejs')%>
         <a href="/signout">sign out</a>
-        <form action="/todos" method="post">
-          <input type="hidden" name="_csrf" value="<%= csrfToken%>" />
-          <div class="flex gap-4 py-2">
-            <div class="flex-auto">
-              <input
-                type="text"
-                name="title"
-                placeholder="What's next?"
-                class="border border-gray-300 rounded text-gray-900 w-50 p-2 text-sm"
-              />
+        <form action="/todos" method="post" enctype="multipart/form-data">
+          <!-- <input type="hidden" name="_//csrf" value="<%= //csrfToken%>" /> -->
+          <div>
+            <div class="flex gap-4 py-2">
+              <div class="flex-auto">
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="What's next?"
+                  class="border border-gray-300 rounded text-gray-900 w-50 p-2 text-sm"
+                />
+              </div>
+              <div class="flex-auto">
+                <input
+                  type="date"
+                  name="dueDate"
+                  class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4"
+                />
+              </div>
             </div>
             <div class="flex-auto">
               <input
-                type="date"
-                name="dueDate"
+                type="file"
+                name="images"
+                accept="image/*"
+                multiple
                 class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4"
+                
               />
             </div>
-            <div class="flex-auto">
-              <input
-                type="time"
-                name="dueDate"
-                class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4"
-              />
-            </div>
+            <div id="image-preview" class="flex gap-2 mt-2"></div>
             <div class="flex-none">
               <button
                 type="submit"
@@ -86,18 +92,6 @@
               </button>
             </div>
           </div>
-            <div class="flex-auto">
-              <input
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4"
-              onchange="handleFileSelect(event)"
-              />
-            </div>
-            <div id="image-preview" class="flex gap-2 mt-2"></div>
-           
         </form>
 
         <table>
@@ -109,23 +103,5 @@
         <%- include('footer.ejs')%>
       </div>
     </div>
-    <script>
-      let imagesArray = [];
-
-      function handleFileSelect(event) {
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        imagesArray.push(files[i]);
-        const reader = new FileReader();
-        reader.onload = function (e) {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.classList.add("w-20", "h-20", "object-cover", "rounded");
-        document.getElementById("image-preview").appendChild(img);
-        };
-        reader.readAsDataURL(files[i]);
-      }
-      }
-    </script>
   </body>
 </html>

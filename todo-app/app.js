@@ -4,8 +4,9 @@ const app = express();
 const { Todo, User } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
+const multer = require("multer");
 const cookieParser = require("cookie-parser");
-const csrf = require("tiny-csrf");
+//const //csrf = require("tiny-//csrf");
 
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
@@ -13,13 +14,13 @@ const session = require("express-session");
 const localStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 
 const saltRounds = 10;
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secret string"));
-app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+//app.use(//csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
 app.set("view engine", "ejs"); //we are not using plain html
 
@@ -36,13 +37,13 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.set("views",path.join(__dirname,"views"));
+app.set("views", path.join(__dirname, "views"));
 app.use(flash());
 
-app.use(function(request,response,next){
+app.use(function (request, response, next) {
   response.locals.messages = request.flash();
   next();
-})
+});
 //definig the authentication strategy
 passport.use(
   new localStrategy(
@@ -60,7 +61,7 @@ passport.use(
           if (result) {
             return done(null, user);
           } else {
-            return done(null,false,{message:"Invalid password"});
+            return done(null, false, { message: "Invalid password" });
           }
           //whenever the user is properly authenticated we are passing the user obejct through the done callback if the user is not properly authenticated we are passing the error function back
         })
@@ -88,12 +89,23 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "images")); // Save in the images folder
+  },
+  filename: function (req, file, cb) {
+    const userId = req.user.id; // Assuming `req.user.id` is the ID of the user
+    cb(null, userId + "-" + file.originalname); // Append user ID and unique suffix to file name
+  },
+});
 
+// Set up multer middleware
+const upload = multer({ storage: storage });
 
 app.get("/", async (request, response) => {
   response.render("index", {
     title: "Todo application",
-    csrfToken: request.csrfToken(),
+    //csrfToken: request.//csrfToken(),
   });
 });
 
@@ -115,7 +127,7 @@ app.get(
         dueToday,
         dueLater,
         completed,
-        csrfToken: request.csrfToken(),
+        //csrfToken: request.//csrfToken(),
       });
     } else {
       response.json({
@@ -131,7 +143,7 @@ app.get(
 app.get("/signup", (request, response) => {
   response.render("signup", {
     title: "Signup",
-    csrfToken: request.csrfToken(),
+    //csrfToken: request.//csrfToken(),
   });
 });
 
@@ -161,13 +173,16 @@ app.post("/users", async (request, response) => {
 app.get("/login", (request, response) => {
   response.render("login", {
     title: "Login",
-    csrfToken: request.csrfToken(),
+    //csrfToken: request.//csrfToken(),
   });
 });
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login",failureFlash:true,}),
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
   (request, response) => {
     console.log(request.user);
     response.redirect("/todos");
@@ -186,15 +201,20 @@ app.get("/signout", (request, response, next) => {
 app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
+  upload.array("images", 10),
   async (request, response) => {
     console.log("Creating a todo", request.body);
     console.log(request.user);
-    // Todo
+
+    const files = request.files;
+    const uploadedFilePaths = files.map((file) => file.path);
+
     try {
       await Todo.addTodo({
         title: request.body.title,
         dueDate: request.body.dueDate,
         userId: request.user.id,
+        uploadedFilePaths: uploadedFilePaths,
       });
 
       // return response.json(todo); //initially
@@ -234,7 +254,7 @@ app.delete(
       const todo = await Todo.findByPk(request.params.id);
       console.log("after todo");
       if (!todo) {
-        return res
+        return response
           .status(404)
           .json({ success: false, message: "Todo not found" });
       }

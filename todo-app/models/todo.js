@@ -9,12 +9,13 @@ module.exports = (sequelize, DataTypes) => {
       });
       
     }
-    static addTodo({ title, dueDate, userId }) {
+    static addTodo({ title, dueDate, userId ,uploadedFilePaths}) {
       return this.create({
         title: title,
         dueDate: dueDate,
         completed: false,
-        userId,
+        userId, //this is equi to userId: userId,
+        uploadedFilePaths,
       });
     }
 
@@ -145,6 +146,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull:false
       },
       completed: { type: DataTypes.BOOLEAN, defaultValue: false },
+
+      uploadedFilePaths:{
+        type:DataTypes.ARRAY(DataTypes.STRING),
+        allowNull:true
+      }
      },
     {
       sequelize,

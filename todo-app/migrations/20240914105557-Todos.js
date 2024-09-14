@@ -18,6 +18,10 @@ module.exports = {
       completed: {
         type: Sequelize.BOOLEAN,
       },
+      uploadedFilePaths: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

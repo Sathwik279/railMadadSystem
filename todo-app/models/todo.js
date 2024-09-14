@@ -2,16 +2,12 @@
 const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    // define association here
     static associate(models) {
       Todo.belongsTo(models.User, {
         foreignKey: "userId",
       });
-      // define association here
+      
     }
     static addTodo({ title, dueDate, userId }) {
       return this.create({
@@ -96,16 +92,7 @@ module.exports = (sequelize, DataTypes) => {
       console.log("My Todo list \n");
 
       console.log("Overdue");
-      // FILL IN HERE
-      //  const overdue = await Todo.findAll({
-      //     where:{
-      //       dueDate:{
-      //         [Op.lt]: today.toISOString().split("T")[0]
-      //       }
-      //     }
-      //   })
-      //  //overdue is a list of todo objects
-      //  const  overdueList = overdue.map((item)=>item.displayableString()).join("\n");
+     
       const overdue = await Todo.overdue();
       const overdueList = overdue
         .map((item) => item.displayableString())
@@ -115,14 +102,7 @@ module.exports = (sequelize, DataTypes) => {
       console.log("\n");
 
       console.log("Due Today");
-      // FILL IN HERE
-      //  const  duetoday = await Todo.findAll({
-      //     where:{
-      //       dueDate:{
-      //         [Op.eq]: today.toISOString().split("T")[0]
-      //       }
-      //     }
-      //   })
+    
 
       const dueToday = await Todo.dueToday();
       const dueTodayList = dueToday
@@ -131,14 +111,7 @@ module.exports = (sequelize, DataTypes) => {
       console.log(dueTodayList);
 
       console.log("Due Later");
-      // FILL IN HERE
-      //  const  duelater = await Todo.findAll({
-      //     where:{
-      //       dueDate:{
-      //         [Op.gt]: today.toISOString().split("T")[0]
-      //       }
-      //     }
-      //   })
+  
       const dueLater = await Todo.dueLater();
       const dueLaterList = dueLater
         .map((item) => item.displayableString())
@@ -146,18 +119,7 @@ module.exports = (sequelize, DataTypes) => {
       console.log(dueLaterList);
     }
 
-    //  async deleteTodo(id){
-    //     try {
-    //       await this.destroy();
-    //       const todo = await Todo.findByPk(this.id);
-    //       return todo === null;
-    //     } catch (error) {
-    //       // In case of error, return false
-    //       return false;
-    //     }
-    //   }
-
-    //this method is similar to the above method
+    
     static async remove(id, userId) {
       return this.destroy({
         where: {
@@ -183,7 +145,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull:false
       },
       completed: { type: DataTypes.BOOLEAN, defaultValue: false },
-    },
+     },
     {
       sequelize,
       modelName: "Todo",

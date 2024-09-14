@@ -88,28 +88,7 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-// app.get("/todos", async (request, response) => {
-//   console.log("Fetching the Todo list");
-//   try {
-//     const todoList = await Todo.findAll();
-//     return response.json(todoList);
-//   } catch (error) {
-//     cconsole.log(error);
-//     return response.status(422).json(error);
-//   }
-// });
-// app.get("/", async (request, response) => {
-//   const allTodos = await Todo.getTodos();
-//   if (request.accepts("html")) {
-//     response.render("index", {
-//       allTodos,
-//     });
-//   } else {
-//     response.json({
-//       allTodos,
-//     });
-//   }
-// });
+
 
 app.get("/", async (request, response) => {
   response.render("index", {
@@ -249,18 +228,6 @@ app.delete(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     console.log("Delete a todo by ID:", request.params.id);
-
-    // try {
-    //   const todo = await Todo.findByPk(request.params.id);
-    //   if (!todo) {
-    //     return response.status(404).send(false);
-    //   }
-
-    //   const returnValue = await todo.deleteTodo();
-    //   return response.send(returnValue);
-    // } catch (error) {
-    //   return response.status(422).send(false);
-    // }
 
     try {
       console.log("before todo");
